@@ -18,3 +18,19 @@ class Plan extends Model
         'billing_cycle',
         'features',
         'is_active',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'price' => 'decimal:2',
+            'features' => 'array',
+            'is_active' => 'boolean',
+        ];
+    }
+
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class);
+    }
+}
