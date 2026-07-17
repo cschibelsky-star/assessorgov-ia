@@ -11,7 +11,7 @@ class WebhookEvent extends Model
 
     protected $fillable = [
         'provider',
-        'event_id',
+        'external_id',
         'event_type',
         'status',
         'payload',
