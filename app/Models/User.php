@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -36,5 +37,10 @@ class User extends Authenticatable
     public function customer()
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    public function culturalProfile(): HasOne
+    {
+        return $this->hasOne(CulturalProfile::class);
     }
 }
