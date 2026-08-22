@@ -6,8 +6,9 @@ use App\Http\Controllers\CulturalOpportunityController;
 use App\Http\Controllers\CulturalProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'cultura.landing')->name('home');
-Route::view('/cultura/conheca', 'cultura.landing')->name('cultura.landing');
+Route::view('/', 'home')->name('home');
+Route::view('/cultura', 'cultura.landing')->name('cultura.landing');
+Route::redirect('/cultura/conheca', '/cultura', 301);
 
 Route::get('/status', function () {
     return response()->json([
@@ -30,7 +31,7 @@ Route::middleware('guest')->group(function () {
 
 Route::post('/sair', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
-Route::middleware('auth')->prefix('cultura')->name('cultura.')->group(function () {
+Route::middleware('auth')->prefix('cultura/app')->name('cultura.')->group(function () {
     Route::get('/', CulturaDashboardController::class)->name('dashboard');
     Route::get('/perfil', [CulturalProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/perfil', [CulturalProfileController::class, 'update'])->name('profile.update');
