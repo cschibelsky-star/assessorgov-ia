@@ -6,7 +6,10 @@ use App\Http\Controllers\CulturalOpportunityController;
 use App\Http\Controllers\CulturalProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
+Route::view('/', 'cultura.landing')->name('home');
+Route::view('/cultura/conheca', 'cultura.landing')->name('cultura.landing');
+
+Route::get('/status', function () {
     return response()->json([
         'application' => config('app.name', 'AssessorGov IA'),
         'status' => 'ok',
