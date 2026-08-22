@@ -4,17 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Models\CulturalOpportunity;
 use App\Services\Cultura\CulturalOpportunityMatcher;
+use App\Services\Cultura\CulturaPlanResolver;
 use Illuminate\Http\Request;
 
 class CulturaDashboardController extends Controller
 {
-    public function __invoke(Request $request, CulturalOpportunityMatcher $matcher)
-    {
+    public function __invoke(
+        Request $request,
+        CulturalOpportunityMatcher $matcher,
+        CulturaPlanResolver $planResolver
+    ) {
         $user = $request->user();
         $profile = $user?->culturalProfile;
-        $planSlug = 'gratuito';
-        $limits = config('assessorgov_cultura.plans.' . $planSlug, []);
-        $radarLimit = (int) ($limits['radar_limit'] ?? 5);
+        $plan = $planResolver->resolve($user);
+        $planSlug = $plan['slug'];
+        $limits = $plan['limits'];
+        $radarLimit = $limits['radar_limit'] ?? 5;
 
         $opportunities = CulturalOpportunity::query()
             ->saoPaulo()
@@ -23,11 +28,13 @@ class CulturaDashboardController extends Controller
             ->limit(200)
             ->get();
 
+        $effectiveLimit = $radarLimit === null ? $opportunities->count() : (int) $radarLimit;
+
         if ($profile) {
-            $radar = $matcher->rank($profile, $opportunities, $radarLimit);
+            $radar = $matcher->rank($profile, $opportunities, $effectiveLimit);
         } else {
             $radar = $opportunities
-                ->take($radarLimit)
+                ->take($effectiveLimit)
                 ->values()
                 ->map(fn (CulturalOpportunity $opportunity) => [
                     'opportunity' => $opportunity,
