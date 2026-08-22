@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CulturaDashboardController;
 use App\Http\Controllers\CulturalOpportunityController;
 use App\Http\Controllers\CulturalProfileController;
@@ -16,6 +17,15 @@ Route::get('/', function () {
         ],
     ]);
 });
+
+Route::middleware('guest')->group(function () {
+    Route::get('/entrar', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/entrar', [AuthController::class, 'login'])->name('login.store');
+    Route::get('/cadastro', [AuthController::class, 'showRegister'])->name('register');
+    Route::post('/cadastro', [AuthController::class, 'register'])->name('register.store');
+});
+
+Route::post('/sair', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 Route::middleware('auth')->prefix('cultura')->name('cultura.')->group(function () {
     Route::get('/', CulturaDashboardController::class)->name('dashboard');
