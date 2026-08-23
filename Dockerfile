@@ -1,13 +1,13 @@
 FROM composer:2 AS vendor
 WORKDIR /app
-COPY composer.json composer.lock* ./
+COPY composer.json ./
 RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --no-scripts
 
 FROM php:8.3-apache
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends libzip-dev unzip curl \
-    && docker-php-ext-install pdo_mysql \
+    && apt-get install -y --no-install-recommends libonig-dev libzip-dev unzip curl \
+    && docker-php-ext-install mbstring pdo_mysql \
     && a2enmod rewrite \
     && rm -rf /var/lib/apt/lists/* \
     && sed -ri 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/*.conf \
