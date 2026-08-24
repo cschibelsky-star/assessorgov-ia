@@ -22,7 +22,7 @@ services:
       CACHE_STORE: database
       QUEUE_CONNECTION: database
     ports:
-      - "127.0.0.1:8892:80"
+      - "127.0.0.1:32768:80"
     depends_on:
       assessorgov_db_hml:
         condition: service_healthy
