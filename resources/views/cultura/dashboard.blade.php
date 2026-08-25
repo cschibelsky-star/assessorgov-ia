@@ -14,9 +14,9 @@
         <div class="brand">VITRINE IA PRO</div>
         <div class="product">Assessor Cultura GovIA</div>
         <nav class="nav">
-            <a class="active" href="#">Visao geral</a>
+            <a class="active" href="{{ route('cultura.dashboard') }}">Visao geral</a>
             <a href="#radar">Radar Cultural</a>
-            <a href="#perfil">Meu perfil cultural</a>
+            <a href="{{ route('cultura.profile.edit') }}">Meu perfil cultural</a>
             <a href="#projetos">Projetos</a>
             <a href="#monitoramento">Monitoramento</a>
             <a href="#plano">Plano e limites</a>
@@ -62,11 +62,11 @@
                     <div class="limit"><strong>Radar Cultural</strong><div class="muted">{{ $limits['radar_limit'] ?? 'Ilimitado' }} oportunidades</div></div>
                     <div class="limit"><strong>Projetos em elaboracao</strong><div class="muted">{{ $limits['draft_projects_limit'] ?? 'Ilimitado' }}</div></div>
                     <div class="limit"><strong>Monitoramentos ativos</strong><div class="muted">{{ $limits['active_monitoring_limit'] ?? 'Ilimitado' }}</div></div>
-                    @if($planSlug === 'gratuito')<div class="notice">O plano gratuito permite descobrir oportunidades. Para analisar, preparar e acompanhar uma inscricao, contrate um plano pago.</div><a class="cta" href="#">Conhecer planos pagos</a>@endif
+                    @if($planSlug === 'gratuito')<div class="notice">O plano gratuito permite descobrir oportunidades. Para analisar, preparar e acompanhar uma inscricao, contrate um plano pago.</div><a class="cta" href="{{ route('cultura.landing') }}#planos">Conhecer planos pagos</a>@endif
                 </section>
                 <section class="card" id="perfil" style="margin-top:18px">
                     <div class="section-title"><h2>Perfil cultural</h2></div>
-                    @if($profile)<div class="muted">Perfil configurado. O ranking considera area cultural, perfil juridico, territorio, faixa financeira e prazo.</div>@else<div class="notice">Complete seu perfil cultural para o Radar calcular a aderencia de cada oportunidade.</div><a class="cta" href="#">Configurar perfil</a>@endif
+                    @if($profile)<div class="muted">Perfil configurado. O ranking considera area cultural, perfil juridico, territorio, faixa financeira e prazo.</div><a class="cta" href="{{ route('cultura.profile.edit') }}">Editar perfil</a>@else<div class="notice">Complete seu perfil cultural para o Radar calcular a aderencia de cada oportunidade.</div><a class="cta" href="{{ route('cultura.profile.edit') }}">Configurar perfil</a>@endif
                 </section>
             </aside>
         </div>
