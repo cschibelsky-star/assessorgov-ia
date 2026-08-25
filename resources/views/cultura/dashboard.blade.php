@@ -42,13 +42,19 @@
                     @php($o = $item['opportunity'])
                     <article class="opp">
                         <div class="opp-head">
-                            <div><h3>{{ $o->title }}</h3><div class="meta"><span>{{ $o->organization ?: $o->source_name }}</span>@if($o->closes_at)<span>Prazo: {{ $o->closes_at->format('d/m/Y') }}</span>@endif @if($o->funding_max)<span>Ate R$ {{ number_format((float)$o->funding_max, 2, ',', '.') }}</span>@endif</div></div>
-                            <div class="score">{{ $item['score'] !== null ? $item['score'].'%' : 'Perfil pendente' }}</div>
+                            <div><h3>{{ $o->title }}</h3><div class="meta"><span>{{ $o->organization ?: $o->source_name }}</span>@if($o->closes_at)<span>Prazo: {{ $o->closes_at->format('d/m/Y') }}</span>@if(now()->diffInDays($o->closes_at, false) <= 7)<span style="color:var(--warning);font-weight:800">Urgente</span>@endif @endif @if($o->funding_max)<span>Ate R$ {{ number_format((float)$o->funding_max, 2, ',', '.') }}</span>@endif</div></div>
+                            <div class="score">{{ $item['score'] !== null ? $item['score'].'% aderente' : 'Perfil pendente' }}</div>
                         </div>
+                        @if($item['score'] !== null)
+                            <div class="meta" style="margin-top:10px">
+                                @foreach($item['reasons'] as $reason)<span>✓ {{ str_replace('_',' ',$reason) }}</span>@endforeach
+                                @foreach($item['warnings'] as $warning)<span style="color:var(--warning)">⚠ {{ str_replace('_',' ',$warning) }}</span>@endforeach
+                            </div>
+                        @endif
                         @if($planSlug === 'gratuito')
-                            <a class="cta" href="#plano">Quero participar · ver planos</a>
+                            <a class="cta" href="{{ route('cultura.landing') }}#planos">Quero participar · ver planos</a>
                         @else
-                            <a class="cta" href="{{ $o->source_url }}" target="_blank" rel="noopener">Analisar oportunidade</a>
+                            <a class="cta" href="{{ route('cultura.opportunities.show', $o) }}">Analisar oportunidade</a>
                         @endif
                     </article>
                 @empty
