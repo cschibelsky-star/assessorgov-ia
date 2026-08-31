@@ -2,41 +2,47 @@
 
 namespace App\Services\Cultura;
 
+use App\Contracts\Radar\OpportunitySourceAdapter;
 use App\Models\CulturalOpportunity;
 use App\Models\Opportunity;
+use InvalidArgumentException;
 
-class CulturalOpportunityCanonicalAdapter
+class CulturalOpportunityCanonicalAdapter implements OpportunitySourceAdapter
 {
-    public function toCanonical(CulturalOpportunity $opportunity): array
+    public function toCanonical(mixed $source): array
     {
+        if (! $source instanceof CulturalOpportunity) {
+            throw new InvalidArgumentException('CulturalOpportunityCanonicalAdapter expects a CulturalOpportunity instance.');
+        }
+
         return [
-            'external_id' => $opportunity->external_id ?: 'cultura-'.$opportunity->getKey(),
-            'title' => $opportunity->title,
-            'summary' => $opportunity->summary,
-            'source_url' => $opportunity->source_url,
-            'source_type' => $opportunity->source_type ?: 'official',
-            'organization' => $opportunity->organization,
-            'jurisdiction' => $opportunity->state ? 'Estado de '.$opportunity->state : null,
-            'state' => $opportunity->state,
-            'municipalities' => $opportunity->municipalities,
-            'estimated_value' => $opportunity->funding_max ?? $opportunity->funding_min,
-            'opens_at' => $opportunity->opens_at,
-            'closes_at' => $opportunity->closes_at,
-            'requirements' => $opportunity->eligibility_rules,
-            'required_documents' => $opportunity->required_documents,
-            'metadata' => array_merge($opportunity->metadata ?? [], [
+            'external_id' => $source->external_id ?: 'cultura-'.$source->getKey(),
+            'title' => $source->title,
+            'summary' => $source->summary,
+            'source_url' => $source->source_url,
+            'source_type' => $source->source_type ?: 'official',
+            'organization' => $source->organization,
+            'jurisdiction' => $source->state ? 'Estado de '.$source->state : null,
+            'state' => $source->state,
+            'municipalities' => $source->municipalities,
+            'estimated_value' => $source->funding_max ?? $source->funding_min,
+            'opens_at' => $source->opens_at,
+            'closes_at' => $source->closes_at,
+            'requirements' => $source->eligibility_rules,
+            'required_documents' => $source->required_documents,
+            'metadata' => array_merge($source->metadata ?? [], [
                 'vertical' => 'cultura',
-                'cultural_opportunity_id' => $opportunity->getKey(),
-                'cultural_areas' => $opportunity->cultural_areas,
-                'eligible_legal_profiles' => $opportunity->eligible_legal_profiles,
-                'funding_min' => $opportunity->funding_min,
-                'funding_max' => $opportunity->funding_max,
-                'opportunity_type' => $opportunity->opportunity_type,
+                'cultural_opportunity_id' => $source->getKey(),
+                'cultural_areas' => $source->cultural_areas,
+                'eligible_legal_profiles' => $source->eligible_legal_profiles,
+                'funding_min' => $source->funding_min,
+                'funding_max' => $source->funding_max,
+                'opportunity_type' => $source->opportunity_type,
             ]),
-            'status' => $opportunity->status,
-            'source_checked_at' => $opportunity->source_checked_at,
+            'status' => $source->status,
+            'source_checked_at' => $source->source_checked_at,
             '_channel' => Opportunity::CHANNEL_FOMENTO,
-            '_source_name' => 'cultura:'.$opportunity->source_name,
+            '_source_name' => 'cultura:'.$source->source_name,
         ];
     }
 }
