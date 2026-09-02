@@ -18,6 +18,9 @@ services:
       DB_DATABASE: ${DB_DATABASE:-assessorgov}
       DB_USERNAME: ${DB_USERNAME:-assessorgov}
       DB_PASSWORD: ${DB_PASSWORD}
+      ASAAS_API_URL: ${ASAAS_API_URL:-https://api-sandbox.asaas.com/v3}
+      ASAAS_API_KEY: ${ASAAS_API_KEY}
+      ASAAS_WEBHOOK_TOKEN: ${ASAAS_WEBHOOK_TOKEN}
       SESSION_DRIVER: database
       CACHE_STORE: database
       QUEUE_CONNECTION: database
