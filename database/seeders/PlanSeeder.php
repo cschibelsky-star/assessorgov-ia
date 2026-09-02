@@ -30,7 +30,7 @@ class PlanSeeder extends Seeder
                 'name' => 'Profissional',
                 'slug' => 'profissional',
                 'description' => 'Para fazedores de cultura que querem participar de editais com apoio de IA e monitorar projetos aprovados.',
-                'price' => 0.00,
+                'price' => 197.00,
                 'billing_cycle' => 'monthly',
                 'features' => [
                     'included_users' => 1,
@@ -46,7 +46,7 @@ class PlanSeeder extends Seeder
                 'name' => 'Premium',
                 'slug' => 'premium',
                 'description' => 'Para operacao cultural ampliada com mais projetos e monitoramentos simultaneos.',
-                'price' => 0.00,
+                'price' => 397.00,
                 'billing_cycle' => 'monthly',
                 'features' => [
                     'included_users' => 1,

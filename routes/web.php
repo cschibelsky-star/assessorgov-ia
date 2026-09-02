@@ -31,6 +31,8 @@ Route::middleware('guest')->group(function () {
 
 Route::post('/sair', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
+Route::view('/app', 'app-hub')->middleware('auth')->name('app.hub');
+
 Route::middleware('auth')->prefix('cultura/app')->name('cultura.')->group(function () {
     Route::get('/', CulturaDashboardController::class)->name('dashboard');
     Route::get('/perfil', [CulturalProfileController::class, 'edit'])->name('profile.edit');

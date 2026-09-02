@@ -9,7 +9,7 @@ services:
       APP_NAME: "AssessorGov IA"
       APP_ENV: production
       APP_DEBUG: "false"
-      APP_URL: https://assessorgovia.com.br
+      APP_URL: https://cultura.hml.vitrineiapro.com.br
       APP_KEY: ${APP_KEY}
       LOG_CHANNEL: stderr
       DB_CONNECTION: mysql
@@ -32,6 +32,9 @@ services:
       timeout: 5s
       retries: 10
       start_period: 30s
+    networks:
+      - default
+      - vitrine_net
 
   assessorgov_db_hml:
     image: mariadb:11.4
@@ -50,6 +53,10 @@ services:
       timeout: 5s
       retries: 10
       start_period: 20s
+
+networks:
+  vitrine_net:
+    external: true
 
 volumes:
   assessorgov_db_hml_data:
