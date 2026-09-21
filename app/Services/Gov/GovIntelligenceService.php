@@ -7,6 +7,7 @@ use App\Models\CustomerOpportunity;
 use App\Models\Opportunity;
 use App\Models\User;
 use Illuminate\Support\Collection;
+use InvalidArgumentException;
 
 class GovIntelligenceService
 {
@@ -50,6 +51,138 @@ class GovIntelligenceService
                 'monitoring' => $items->where('impact_class', 'monitor')->count(),
             ],
             'priorities' => $items->whereIn('priority', ['critical', 'high'])->take(3)->values(),
+        ];
+    }
+
+    public function findItem(string $itemId): array
+    {
+        $item = $this->catalog()->firstWhere('id', $itemId);
+
+        if (! $item) {
+            throw new InvalidArgumentException('Gov Intelligence item not found.');
+        }
+
+        return $item;
+    }
+
+    public function applyToCustomer(User $user, string $itemId): array
+    {
+        $customer = $user->customer;
+
+        if (! $customer) {
+            return [
+                'status' => 'customer_required',
+                'applied' => 0,
+                'item' => $this->findItem($itemId),
+            ];
+        }
+
+        $item = $this->findItem($itemId);
+
+        $query = CustomerOpportunity::query()
+            ->with('opportunity:id,channel,title')
+            ->where('customer_id', $customer->getKey());
+
+        $customerOpportunities = (clone $query)
+            ->whereHas('opportunity', fn ($q) => $q->whereIn('channel', $item['channels'] ?? []))
+            ->get();
+
+        if ($customerOpportunities->isEmpty() && ($item['universal_supplier'] ?? false)) {
+            $customerOpportunities = $query->get();
+        }
+
+        foreach ($customerOpportunities as $customerOpportunity) {
+            $metadata = $customerOpportunity->metadata ?? [];
+            $actions = is_array($metadata['gov_intelligence_actions'] ?? null)
+                ? $metadata['gov_intelligence_actions']
+                : [];
+
+            $actions[$itemId] = [
+                'id' => $itemId,
+                'title' => $item['title'],
+                'action' => $item['action'],
+                'priority' => $item['priority'],
+                'impact_class' => $item['impact_class'],
+                'target' => $item['action_target'],
+                'status' => $actions[$itemId]['status'] ?? 'pending',
+                'applied_at' => now()->toIso8601String(),
+                'applied_by_user_id' => $user->getKey(),
+            ];
+
+            $metadata['gov_intelligence_actions'] = $actions;
+
+            $customerOpportunity->forceFill(['metadata' => $metadata])->save();
+        }
+
+        return [
+            'status' => $customerOpportunities->isEmpty() ? 'no_linked_opportunity' : 'applied',
+            'applied' => $customerOpportunities->count(),
+            'item' => $item,
+        ];
+    }
+
+    public function complianceForUser(User $user): array
+    {
+        $customer = $user->customer;
+
+        if (! $customer) {
+            return [
+                'customer' => null,
+                'actions' => collect(),
+                'pending' => 0,
+            ];
+        }
+
+        $rows = CustomerOpportunity::query()
+            ->with('opportunity:id,title,channel')
+            ->where('customer_id', $customer->getKey())
+            ->get();
+
+        $actions = collect();
+
+        foreach ($rows as $row) {
+            $stored = $row->metadata['gov_intelligence_actions'] ?? [];
+
+            if (! is_array($stored)) {
+                continue;
+            }
+
+            foreach ($stored as $action) {
+                $id = $action['id'] ?? null;
+
+                if (! $id) {
+                    continue;
+                }
+
+                $existing = $actions->get($id, [
+                    ...$action,
+                    'opportunities' => collect(),
+                ]);
+
+                $existing['opportunities']->push([
+                    'id' => $row->opportunity_id,
+                    'title' => $row->opportunity?->title,
+                    'channel' => $row->opportunity?->channel,
+                    'stage' => $row->stage,
+                ]);
+
+                $actions->put($id, $existing);
+            }
+        }
+
+        $actions = $actions
+            ->map(function (array $action): array {
+                $action['opportunities'] = $action['opportunities']->unique('id')->values();
+
+                return $action;
+            })
+            ->sortBy(fn (array $action): int => $this->priorityWeight($action['priority'] ?? 'medium'))
+            ->values();
+
+        return [
+            'customer' => $customer,
+            'actions' => $actions,
+            'pending' => $actions->where('status', 'pending')->count(),
         ];
     }
 
@@ -104,6 +237,7 @@ class GovIntelligenceService
                 'fact' => 'O TCU reforçou que quantitativo inferior ao estimado não autoriza desclassificação automática; produtividade, metodologia e atendimento dos resultados precisam ser avaliados.',
                 'analysis' => 'Estruturas apoiadas por automação e IA podem ser competitivas, mas precisam comprovar capacidade de entrega e contingência.',
                 'action' => 'Revisar equipe proposta, produtividade, metodologia, SLA e plano de contingência.',
+                'action_target' => 'exequibilidade',
                 'priority' => 'high',
                 'impact_class' => 'alter_rule',
                 'kind' => 'risk',
@@ -119,6 +253,7 @@ class GovIntelligenceService
                 'fact' => 'Itens indispensáveis com custo zero exigem demonstração da origem econômica do custo; não há aceitação ou rejeição automática.',
                 'analysis' => 'Ativos próprios, custos absorvidos ou renúncia de remuneração precisam ser rastreáveis para sustentar a exequibilidade.',
                 'action' => 'Identificar rubricas com custo zero e anexar justificativa e evidência correspondente.',
+                'action_target' => 'custos',
                 'priority' => 'high',
                 'impact_class' => 'alter_data',
                 'kind' => 'risk',
@@ -134,6 +269,7 @@ class GovIntelligenceService
                 'fact' => 'A análise preventiva de impedimento pode alcançar relações societárias relevantes, não apenas o CNPJ participante.',
                 'analysis' => 'Parcerias, coligadas, controladoras e apoio técnico ao órgão precisam ser verificados antes da participação.',
                 'action' => 'Mapear grupo econômico e vínculos com consultorias ou apoio técnico relacionado ao órgão contratante.',
+                'action_target' => 'grupo-economico',
                 'priority' => 'critical',
                 'impact_class' => 'alter_rule',
                 'kind' => 'risk',
@@ -149,6 +285,7 @@ class GovIntelligenceService
                 'fact' => 'O Sicx passou a integrar o marco das compras públicas para bens e serviços comuns padronizados, com credenciamento e ofertas comparáveis.',
                 'analysis' => 'Produtos com escopo, SLA, unidade de fornecimento e preço padronizados podem ganhar um novo canal comercial.',
                 'action' => 'Preparar catálogo Sicx-ready, sem ativar integração automática antes de contrato oficial de dados.',
+                'action_target' => 'sicx-ready',
                 'priority' => 'medium',
                 'impact_class' => 'monitor',
                 'kind' => 'opportunity',
@@ -164,6 +301,7 @@ class GovIntelligenceService
                 'fact' => 'IRPs passaram a aparecer no PNCP como sinais anteriores à contratação consolidada.',
                 'analysis' => 'O acompanhamento antecipado pode melhorar preparação documental, precificação, parceria e capacidade de atendimento.',
                 'action' => 'Monitorar IRPs e manter ingestão automática bloqueada até contrato oficial de API ser validado.',
+                'action_target' => 'irp-monitor',
                 'priority' => 'medium',
                 'impact_class' => 'monitor',
                 'kind' => 'opportunity',
