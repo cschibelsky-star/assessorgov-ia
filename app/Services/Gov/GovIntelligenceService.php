@@ -164,6 +164,8 @@ class GovIntelligenceService
                     'title' => $row->opportunity?->title,
                     'channel' => $row->opportunity?->channel,
                     'stage' => $row->stage,
+                    'customer_opportunity_id' => $row->getKey(),
+                    'evidence' => $action['evidence'] ?? null,
                 ]);
 
                 $actions->put($id, $existing);
@@ -183,6 +185,8 @@ class GovIntelligenceService
             'customer' => $customer,
             'actions' => $actions,
             'pending' => $actions->where('status', 'pending')->count(),
+            'in_review' => $actions->where('status', 'in_review')->count(),
+            'conformant' => $actions->where('status', 'conformant')->count(),
         ];
     }
 
