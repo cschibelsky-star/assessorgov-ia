@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CulturaDashboardController;
 use App\Http\Controllers\CulturalOpportunityController;
 use App\Http\Controllers\CulturalProfileController;
+use App\Http\Controllers\GovIntelligenceController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'home')->name('home');
@@ -32,7 +33,7 @@ Route::middleware('guest')->group(function () {
 Route::post('/sair', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 Route::middleware('auth')->prefix('app')->name('gov.')->group(function () {
-    Route::view('/inteligencia', 'gov.intelligence')->name('intelligence');
+    Route::get('/inteligencia', GovIntelligenceController::class)->name('intelligence');
 });
 
 Route::middleware('auth')->prefix('cultura/app')->name('cultura.')->group(function () {
