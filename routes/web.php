@@ -35,6 +35,8 @@ Route::middleware('guest')->group(function () {
 
 Route::post('/sair', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
+Route::view('/app', 'app-hub')->middleware('auth')->name('app.hub');
+
 Route::middleware('auth')->prefix('app')->name('gov.')->group(function () {
     Route::get('/inteligencia', GovIntelligenceController::class)->name('intelligence');
     Route::post('/inteligencia/{item}/aplicar', [GovIntelligenceActionController::class, 'store'])->name('intelligence.apply');

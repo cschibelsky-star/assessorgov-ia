@@ -9,7 +9,7 @@ services:
       APP_NAME: "AssessorGov IA"
       APP_ENV: production
       APP_DEBUG: "false"
-      APP_URL: https://assessorgovia.com.br
+      APP_URL: https://cultura.hml.vitrineiapro.com.br
       APP_KEY: ${APP_KEY}
       LOG_CHANNEL: stderr
       DB_CONNECTION: mysql
@@ -18,6 +18,9 @@ services:
       DB_DATABASE: ${DB_DATABASE:-assessorgov}
       DB_USERNAME: ${DB_USERNAME:-assessorgov}
       DB_PASSWORD: ${DB_PASSWORD}
+      ASAAS_API_URL: ${ASAAS_API_URL:-https://api-sandbox.asaas.com/v3}
+      ASAAS_API_KEY: ${ASAAS_API_KEY}
+      ASAAS_WEBHOOK_TOKEN: ${ASAAS_WEBHOOK_TOKEN}
       SESSION_DRIVER: database
       CACHE_STORE: database
       QUEUE_CONNECTION: database
@@ -32,6 +35,9 @@ services:
       timeout: 5s
       retries: 10
       start_period: 30s
+    networks:
+      - default
+      - vitrine_net
 
   assessorgov_db_hml:
     image: mariadb:11.4
@@ -50,6 +56,10 @@ services:
       timeout: 5s
       retries: 10
       start_period: 20s
+
+networks:
+  vitrine_net:
+    external: true
 
 volumes:
   assessorgov_db_hml_data:
