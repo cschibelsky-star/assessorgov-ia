@@ -24,7 +24,7 @@ class GovComplianceEvidenceTest extends TestCase
 
         $this->actingAs($user)
             ->put(route('gov.compliance.update', 'evidence-item'), [
-                'status' => 'in_review',
+                'status' => 'submitted',
                 'evidence' => UploadedFile::fake()->create('proof.pdf', 20, 'application/pdf'),
             ])
             ->assertRedirect();
@@ -40,16 +40,27 @@ class GovComplianceEvidenceTest extends TestCase
             ->assertOk();
     }
 
-    #[Group('known-issue')]
-    public function test_current_behavior_customer_can_mark_compliance_as_conformant(): void
+    public function test_customer_cannot_mark_compliance_as_conformant(): void
     {
         [$user, $row, $item] = $this->scenario();
 
         $this->actingAs($user)
             ->put(route('gov.compliance.update', 'evidence-item'), ['status' => 'conformant'])
+            ->assertSessionHasErrors('status');
+
+        $this->assertSame('pending', $item->refresh()->status);
+    }
+
+    public function test_customer_can_submit_compliance_for_review(): void
+    {
+        [$user, $row, $item] = $this->scenario();
+
+        $this->actingAs($user)
+            ->put(route('gov.compliance.update', 'evidence-item'), ['status' => 'submitted'])
             ->assertRedirect();
 
-        $this->assertSame('conformant', $item->refresh()->status);
+        $this->assertSame('submitted', $item->refresh()->status);
+        $this->assertNotNull($item->submitted_at);
     }
 
     public function test_replacing_evidence_keeps_versions_instead_of_overwriting_history(): void
@@ -58,12 +69,12 @@ class GovComplianceEvidenceTest extends TestCase
         [$user, $row, $item] = $this->scenario();
 
         $this->actingAs($user)->put(route('gov.compliance.update', 'evidence-item'), [
-            'status' => 'in_review',
+            'status' => 'submitted',
             'evidence' => UploadedFile::fake()->create('first.pdf', 20, 'application/pdf'),
         ]);
 
         $this->actingAs($user)->put(route('gov.compliance.update', 'evidence-item'), [
-            'status' => 'in_review',
+            'status' => 'submitted',
             'evidence' => UploadedFile::fake()->create('second.pdf', 20, 'application/pdf'),
         ]);
 
