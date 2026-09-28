@@ -34,6 +34,14 @@ class GovIntelligenceTest extends TestCase
         $this->assertContains('tcu-economic-group-conflict-2026-09', $ids);
         $this->assertContains('sicx-2026', $ids);
         $this->assertContains('irp-pncp-2026', $ids);
-        $this->assertSame(5, $result['stats']['new_changes']);
+        $this->assertContains('tcu-spreadsheet-diligence-2026-09', $ids);
+        $this->assertContains('tcu-unusual-financial-index-2026-09', $ids);
+        $this->assertContains('compras-app-alerts-2026-09', $ids);
+        $this->assertContains('contratos-nfe-xml-2026-09', $ids);
+        $this->assertContains('compras-publicidade-lei-12232-2026-09', $ids);
+        $this->assertContains('serpro-tax-intelligence-subsidy-2026-09', $ids);
+        $this->assertContains('regularize-govbr-2026-09', $ids);
+        $this->assertContains('simples-ibs-cbs-option-2026-09', $ids);
+        $this->assertSame(7, $result['stats']['new_changes']);
     }
 }

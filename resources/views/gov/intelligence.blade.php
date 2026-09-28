@@ -14,6 +14,7 @@
 <p><strong>Análise:</strong> {{ $item['analysis'] }}</p>
 <p><strong>Impacto para você:</strong> {{ $item['personalized_reason'] }}</p>
 <p><strong>Ação recomendada:</strong> {{ $item['action'] }}</p>
+@if(!empty($item['published_at']))<p><strong>Data da fonte:</strong> {{ \Illuminate\Support\Carbon::parse($item['published_at'])->format('d/m/Y') }}@if(!empty($item['deadline_at'])) · <strong>Prazo:</strong> {{ \Illuminate\Support\Carbon::parse($item['deadline_at'])->format('d/m/Y') }}@endif</p>@endif
 <div class="actions">@if($item['relevant'])<form method="POST" action="{{ route('gov.intelligence.apply', $item['id']) }}" style="display:inline">@csrf<button class="btn" type="submit" style="border:0;cursor:pointer">Aplicar ao meu cadastro</button></form>@endif<a class="btn secondary" href="{{ $item['source_url'] }}" target="_blank" rel="noopener">Fonte oficial · {{ $item['source_label'] }}</a></div>
 </article>
 @endforeach
