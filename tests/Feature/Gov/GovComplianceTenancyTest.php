@@ -23,7 +23,7 @@ class GovComplianceTenancyTest extends TestCase
 
         $this->actingAs($userB)
             ->put(route('gov.compliance.update', 'tenant-item'), [
-                'status' => 'in_review',
+                'status' => 'submitted',
                 'note' => 'Tentativa cruzada',
             ])
             ->assertRedirect(route('gov.compliance'));
