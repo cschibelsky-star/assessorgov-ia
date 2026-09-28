@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class GovComplianceEvidence extends Model
 {
+    protected $table = 'gov_compliance_evidences';
+
     protected $fillable = [
         'gov_compliance_item_id',
         'disk',
