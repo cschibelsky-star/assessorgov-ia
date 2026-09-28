@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\CustomerOpportunity;
+use App\Models\GovComplianceEvidence;
+use App\Models\GovComplianceItem;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -26,63 +28,58 @@ class GovComplianceActionController extends Controller
             'evidence' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
         ]);
 
-        $rows = CustomerOpportunity::query()
+        $complianceItem = GovComplianceItem::query()
             ->where('customer_id', $customer->getKey())
-            ->get()
-            ->filter(function (CustomerOpportunity $row) use ($item): bool {
-                $actions = $row->metadata['gov_intelligence_actions'] ?? [];
+            ->where('item_key', $item)
+            ->first();
 
-                return is_array($actions) && isset($actions[$item]);
-            });
-
-        if ($rows->isEmpty()) {
+        if (! $complianceItem) {
             return redirect()->route('gov.compliance')
                 ->with('status', 'A pendência informada não pertence a este cliente.');
         }
 
-        $evidencePath = null;
+        $storedEvidence = null;
 
         if ($request->hasFile('evidence')) {
-            $evidencePath = $request->file('evidence')->store(
+            $file = $request->file('evidence');
+            $path = $file->store(
                 'gov-compliance/'.$customer->getKey().'/'.$item,
                 'local',
             );
+
+            $storedEvidence = [
+                'disk' => 'local',
+                'path' => $path,
+                'original_name' => $file->getClientOriginalName(),
+                'mime_type' => $file->getMimeType(),
+                'sha256' => hash_file('sha256', $file->getRealPath()) ?: null,
+                'size_bytes' => $file->getSize(),
+            ];
         }
 
-        DB::transaction(function () use ($rows, $item, $data, $evidencePath, $request): void {
-            foreach ($rows as $row) {
-                $metadata = $row->metadata ?? [];
-                $actions = $metadata['gov_intelligence_actions'] ?? [];
-                $action = $actions[$item];
+        DB::transaction(function () use ($complianceItem, $data, $storedEvidence, $request): void {
+            $changes = [
+                'status' => $data['status'],
+                'note' => $data['note'] ?? null,
+                'updated_by_user_id' => $request->user()->getKey(),
+            ];
 
-                $action['status'] = $data['status'];
-                $action['note'] = $data['note'] ?? null;
-                $action['updated_at'] = now()->toIso8601String();
-                $action['updated_by_user_id'] = $request->user()->getKey();
+            if ($data['status'] === 'in_review') {
+                $changes['submitted_at'] = now();
+            }
 
-                if ($data['status'] === 'in_review') {
-                    $action['submitted_at'] = now()->toIso8601String();
-                }
+            if ($data['status'] === 'conformant') {
+                $changes['resolved_at'] = now();
+            }
 
-                if ($data['status'] === 'conformant') {
-                    $action['resolved_at'] = now()->toIso8601String();
-                }
+            $complianceItem->forceFill($changes)->save();
 
-                if ($evidencePath !== null) {
-                    $action['evidence'] = [
-                        'disk' => 'local',
-                        'path' => $evidencePath,
-                        'original_name' => $request->file('evidence')->getClientOriginalName(),
-                        'mime_type' => $request->file('evidence')->getClientMimeType(),
-                        'uploaded_at' => now()->toIso8601String(),
-                        'uploaded_by_user_id' => $request->user()->getKey(),
-                    ];
-                }
-
-                $actions[$item] = $action;
-                $metadata['gov_intelligence_actions'] = $actions;
-
-                $row->forceFill(['metadata' => $metadata])->save();
+            if ($storedEvidence !== null) {
+                $complianceItem->evidences()->create([
+                    ...$storedEvidence,
+                    'uploaded_by_user_id' => $request->user()->getKey(),
+                    'uploaded_at' => now(),
+                ]);
             }
         });
 
@@ -90,25 +87,36 @@ class GovComplianceActionController extends Controller
             ->with('status', 'Compliance atualizado com sucesso.');
     }
 
-    public function evidence(Request $request, CustomerOpportunity $customerOpportunity, string $item): StreamedResponse
-    {
+    public function evidence(
+        Request $request,
+        CustomerOpportunity $customerOpportunity,
+        string $item,
+    ): StreamedResponse {
         $customer = $request->user()->customer;
 
-        abort_unless($customer && $customerOpportunity->customer_id === $customer->getKey(), 403);
+        abort_unless($customer && (string) $customerOpportunity->customer_id === (string) $customer->getKey(), 403);
 
-        $action = $customerOpportunity->metadata['gov_intelligence_actions'][$item] ?? null;
-        $evidence = is_array($action) ? ($action['evidence'] ?? null) : null;
+        $complianceItem = GovComplianceItem::query()
+            ->where('customer_id', $customer->getKey())
+            ->where('item_key', $item)
+            ->whereHas(
+                'customerOpportunities',
+                fn ($query) => $query->whereKey($customerOpportunity->getKey()),
+            )
+            ->first();
 
-        abort_unless(is_array($evidence) && ! empty($evidence['path']), 404);
+        abort_unless($complianceItem, 404);
 
-        $disk = $evidence['disk'] ?? 'local';
-        $path = $evidence['path'];
+        $evidence = GovComplianceEvidence::query()
+            ->where('gov_compliance_item_id', $complianceItem->getKey())
+            ->latest('id')
+            ->first();
 
-        abort_unless(Storage::disk($disk)->exists($path), 404);
+        abort_unless($evidence && Storage::disk($evidence->disk)->exists($evidence->path), 404);
 
-        return Storage::disk($disk)->download(
-            $path,
-            $evidence['original_name'] ?? basename($path),
+        return Storage::disk($evidence->disk)->download(
+            $evidence->path,
+            $evidence->original_name ?: basename($evidence->path),
         );
     }
 }
