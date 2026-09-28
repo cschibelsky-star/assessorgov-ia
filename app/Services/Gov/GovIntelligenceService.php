@@ -129,6 +129,7 @@ class GovIntelligenceService
                 'customer' => null,
                 'actions' => collect(),
                 'pending' => 0,
+                'submitted' => 0,
                 'in_review' => 0,
                 'conformant' => 0,
             ];
@@ -180,6 +181,7 @@ class GovIntelligenceService
             'customer' => $customer,
             'actions' => $actions,
             'pending' => $actions->where('status', 'pending')->count(),
+            'submitted' => $actions->where('status', 'submitted')->count(),
             'in_review' => $actions->where('status', 'in_review')->count(),
             'conformant' => $actions->where('status', 'conformant')->count(),
         ];
