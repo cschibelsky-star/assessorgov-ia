@@ -8,6 +8,8 @@ use App\Http\Controllers\GovIntelligenceController;
 use App\Http\Controllers\GovIntelligenceActionController;
 use App\Http\Controllers\GovComplianceController;
 use App\Http\Controllers\GovComplianceActionController;
+use App\Http\Controllers\GovComplianceReviewController;
+use App\Http\Controllers\GovComplianceReviewQueueController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'home')->name('home');
@@ -43,6 +45,8 @@ Route::middleware('auth')->prefix('app')->name('gov.')->group(function () {
     Route::get('/compliance', GovComplianceController::class)->name('compliance');
     Route::put('/compliance/{item}', [GovComplianceActionController::class, 'update'])->name('compliance.update');
     Route::get('/compliance/{customerOpportunity}/{item}/evidencia', [GovComplianceActionController::class, 'evidence'])->name('compliance.evidence');
+    Route::get('/compliance-revisao', GovComplianceReviewQueueController::class)->name('compliance.review.index');
+    Route::put('/compliance-revisao/{complianceItem}', [GovComplianceReviewController::class, 'update'])->name('compliance.review.update');
 });
 
 Route::middleware('auth')->prefix('cultura/app')->name('cultura.')->group(function () {
