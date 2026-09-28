@@ -91,27 +91,26 @@ class GovIntelligenceService
             $customerOpportunities = $query->get();
         }
 
-        foreach ($customerOpportunities as $customerOpportunity) {
-            $metadata = $customerOpportunity->metadata ?? [];
-            $actions = is_array($metadata['gov_intelligence_actions'] ?? null)
-                ? $metadata['gov_intelligence_actions']
-                : [];
+        if ($customerOpportunities->isNotEmpty()) {
+            $complianceItem = GovComplianceItem::query()->updateOrCreate(
+                [
+                    'customer_id' => $customer->getKey(),
+                    'item_key' => $itemId,
+                ],
+                [
+                    'title' => $item['title'],
+                    'action' => $item['action'],
+                    'priority' => $item['priority'],
+                    'impact_class' => $item['impact_class'],
+                    'target' => $item['action_target'],
+                    'applied_at' => now(),
+                    'applied_by_user_id' => $user->getKey(),
+                ],
+            );
 
-            $actions[$itemId] = [
-                'id' => $itemId,
-                'title' => $item['title'],
-                'action' => $item['action'],
-                'priority' => $item['priority'],
-                'impact_class' => $item['impact_class'],
-                'target' => $item['action_target'],
-                'status' => $actions[$itemId]['status'] ?? 'pending',
-                'applied_at' => now()->toIso8601String(),
-                'applied_by_user_id' => $user->getKey(),
-            ];
-
-            $metadata['gov_intelligence_actions'] = $actions;
-
-            $customerOpportunity->forceFill(['metadata' => $metadata])->save();
+            $complianceItem->customerOpportunities()->syncWithoutDetaching(
+                $customerOpportunities->modelKeys(),
+            );
         }
 
         return [
@@ -130,53 +129,49 @@ class GovIntelligenceService
                 'customer' => null,
                 'actions' => collect(),
                 'pending' => 0,
+                'in_review' => 0,
+                'conformant' => 0,
             ];
         }
 
-        $rows = CustomerOpportunity::query()
-            ->with('opportunity:id,title,channel')
+        $actions = GovComplianceItem::query()
+            ->with([
+                'customerOpportunities.opportunity:id,title,channel',
+                'latestEvidence',
+            ])
             ->where('customer_id', $customer->getKey())
-            ->get();
-
-        $actions = collect();
-
-        foreach ($rows as $row) {
-            $stored = $row->metadata['gov_intelligence_actions'] ?? [];
-
-            if (! is_array($stored)) {
-                continue;
-            }
-
-            foreach ($stored as $action) {
-                $id = $action['id'] ?? null;
-
-                if (! $id) {
-                    continue;
-                }
-
-                $existing = $actions->get($id, [
-                    ...$action,
-                    'opportunities' => collect(),
-                ]);
-
-                $existing['opportunities']->push([
-                    'id' => $row->opportunity_id,
-                    'title' => $row->opportunity?->title,
-                    'channel' => $row->opportunity?->channel,
-                    'stage' => $row->stage,
-                    'customer_opportunity_id' => $row->getKey(),
-                    'evidence' => $action['evidence'] ?? null,
-                ]);
-
-                $actions->put($id, $existing);
-            }
-        }
-
-        $actions = $actions
-            ->map(function (array $action): array {
-                $action['opportunities'] = $action['opportunities']->unique('id')->values();
-
-                return $action;
+            ->get()
+            ->map(function (GovComplianceItem $item): array {
+                return [
+                    'id' => $item->item_key,
+                    'title' => $item->title,
+                    'action' => $item->action,
+                    'priority' => $item->priority,
+                    'impact_class' => $item->impact_class,
+                    'target' => $item->target,
+                    'status' => $item->status,
+                    'note' => $item->note,
+                    'evidence' => $item->latestEvidence ? [
+                        'disk' => $item->latestEvidence->disk,
+                        'path' => $item->latestEvidence->path,
+                        'original_name' => $item->latestEvidence->original_name,
+                        'mime_type' => $item->latestEvidence->mime_type,
+                        'sha256' => $item->latestEvidence->sha256,
+                        'size_bytes' => $item->latestEvidence->size_bytes,
+                        'uploaded_at' => $item->latestEvidence->uploaded_at?->toIso8601String(),
+                        'uploaded_by_user_id' => $item->latestEvidence->uploaded_by_user_id,
+                    ] : null,
+                    'opportunities' => $item->customerOpportunities
+                        ->map(fn (CustomerOpportunity $row): array => [
+                            'id' => $row->opportunity_id,
+                            'title' => $row->opportunity?->title,
+                            'channel' => $row->opportunity?->channel,
+                            'stage' => $row->stage,
+                            'customer_opportunity_id' => $row->getKey(),
+                        ])
+                        ->unique('id')
+                        ->values(),
+                ];
             })
             ->sortBy(fn (array $action): int => $this->priorityWeight($action['priority'] ?? 'medium'))
             ->values();
