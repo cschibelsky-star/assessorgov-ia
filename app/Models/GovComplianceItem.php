@@ -19,10 +19,13 @@ class GovComplianceItem extends Model
         'target',
         'status',
         'note',
+        'review_note',
         'applied_at',
         'applied_by_user_id',
         'submitted_at',
         'resolved_at',
+        'reviewed_at',
+        'reviewed_by_user_id',
         'updated_by_user_id',
     ];
 
@@ -32,6 +35,7 @@ class GovComplianceItem extends Model
             'applied_at' => 'datetime',
             'submitted_at' => 'datetime',
             'resolved_at' => 'datetime',
+            'reviewed_at' => 'datetime',
         ];
     }
 
