@@ -19,6 +19,8 @@ jobs:
         with:
           path: vendor
           key: composer-${{ hashFiles('composer.lock') }}
+      - name: Prepare Laravel writable directories
+        run: mkdir -p bootstrap/cache storage/framework/{cache,sessions,views} storage/logs
       - run: composer install --no-interaction --prefer-dist
       - run: cp .env.example .env && php artisan key:generate
       - run: composer test
