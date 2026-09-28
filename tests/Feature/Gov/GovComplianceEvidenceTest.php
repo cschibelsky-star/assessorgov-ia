@@ -4,11 +4,13 @@ namespace Tests\Feature\Gov;
 
 use App\Models\Customer;
 use App\Models\CustomerOpportunity;
+use App\Models\GovComplianceItem;
 use App\Models\Opportunity;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\Group;
 use Tests\TestCase;
 
 class GovComplianceEvidenceTest extends TestCase
@@ -18,7 +20,7 @@ class GovComplianceEvidenceTest extends TestCase
     public function test_evidence_can_be_uploaded_and_downloaded_by_owning_customer(): void
     {
         Storage::fake('local');
-        [$user, $row] = $this->scenario();
+        [$user, $row, $item] = $this->scenario();
 
         $this->actingAs($user)
             ->put(route('gov.compliance.update', 'evidence-item'), [
@@ -27,49 +29,46 @@ class GovComplianceEvidenceTest extends TestCase
             ])
             ->assertRedirect();
 
-        $row->refresh();
-        $path = $row->metadata['gov_intelligence_actions']['evidence-item']['evidence']['path'];
-        Storage::disk('local')->assertExists($path);
+        $evidence = $item->refresh()->evidences()->latest('id')->first();
+
+        $this->assertNotNull($evidence);
+        $this->assertNotNull($evidence->sha256);
+        Storage::disk('local')->assertExists($evidence->path);
 
         $this->actingAs($user)
             ->get(route('gov.compliance.evidence', [$row, 'evidence-item']))
             ->assertOk();
     }
 
-    /** @group known-issue */
+    #[Group('known-issue')]
     public function test_current_behavior_customer_can_mark_compliance_as_conformant(): void
     {
-        [$user, $row] = $this->scenario();
+        [$user, $row, $item] = $this->scenario();
 
         $this->actingAs($user)
             ->put(route('gov.compliance.update', 'evidence-item'), ['status' => 'conformant'])
             ->assertRedirect();
 
-        $this->assertSame(
-            'conformant',
-            $row->refresh()->metadata['gov_intelligence_actions']['evidence-item']['status'],
-        );
+        $this->assertSame('conformant', $item->refresh()->status);
     }
 
-    /** @group known-issue */
-    public function test_current_behavior_replacing_evidence_leaves_previous_file_stored(): void
+    public function test_replacing_evidence_keeps_versions_instead_of_overwriting_history(): void
     {
         Storage::fake('local');
-        [$user, $row] = $this->scenario();
+        [$user, $row, $item] = $this->scenario();
 
         $this->actingAs($user)->put(route('gov.compliance.update', 'evidence-item'), [
             'status' => 'in_review',
             'evidence' => UploadedFile::fake()->create('first.pdf', 20, 'application/pdf'),
         ]);
-        $row->refresh();
-        $firstPath = $row->metadata['gov_intelligence_actions']['evidence-item']['evidence']['path'];
 
         $this->actingAs($user)->put(route('gov.compliance.update', 'evidence-item'), [
             'status' => 'in_review',
             'evidence' => UploadedFile::fake()->create('second.pdf', 20, 'application/pdf'),
         ]);
 
-        Storage::disk('local')->assertExists($firstPath);
+        $this->assertSame(2, $item->evidences()->count());
+        $item->evidences->each(fn ($evidence) => Storage::disk('local')->assertExists($evidence->path));
     }
 
     private function scenario(): array
@@ -80,21 +79,20 @@ class GovComplianceEvidenceTest extends TestCase
         $row = CustomerOpportunity::factory()->create([
             'customer_id' => $customer->getKey(),
             'opportunity_id' => $opportunity->getKey(),
-            'metadata' => [
-                'gov_intelligence_actions' => [
-                    'evidence-item' => [
-                        'id' => 'evidence-item',
-                        'title' => 'Evidência',
-                        'action' => 'Enviar documento',
-                        'priority' => 'high',
-                        'impact_class' => 'alter_rule',
-                        'target' => 'documentos',
-                        'status' => 'pending',
-                    ],
-                ],
-            ],
         ]);
 
-        return [$user, $row];
+        $item = GovComplianceItem::query()->create([
+            'customer_id' => $customer->getKey(),
+            'item_key' => 'evidence-item',
+            'title' => 'Evidência',
+            'action' => 'Enviar documento',
+            'priority' => 'high',
+            'impact_class' => 'alter_rule',
+            'target' => 'documentos',
+            'status' => 'pending',
+        ]);
+        $item->customerOpportunities()->attach($row->getKey());
+
+        return [$user, $row, $item];
     }
 }
