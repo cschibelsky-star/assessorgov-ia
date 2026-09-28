@@ -21,10 +21,10 @@ return new class extends Migration
             $table->string('status', 30)->default('pending')->index();
             $table->text('note')->nullable();
             $table->timestamp('applied_at')->nullable();
-            $table->uuid('applied_by_user_id')->nullable();
+            $table->foreignId('applied_by_user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamp('submitted_at')->nullable();
             $table->timestamp('resolved_at')->nullable();
-            $table->uuid('updated_by_user_id')->nullable();
+            $table->foreignId('updated_by_user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
 
             $table->unique(['customer_id', 'item_key']);
@@ -54,7 +54,7 @@ return new class extends Migration
             $table->string('mime_type', 120)->nullable();
             $table->string('sha256', 64)->nullable()->index();
             $table->unsignedBigInteger('size_bytes')->nullable();
-            $table->uuid('uploaded_by_user_id')->nullable();
+            $table->foreignId('uploaded_by_user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamp('uploaded_at')->nullable();
             $table->timestamps();
         });
