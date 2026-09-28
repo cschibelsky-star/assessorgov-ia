@@ -24,12 +24,14 @@ class TransfereGovSyncService
         }
 
         $processed = 0;
+        $pagesProcessed = 0;
         $pageNumber = 1;
         $reportedTotal = null;
         $reportedPages = null;
 
         while ($pageNumber <= $maxPages) {
             $page = $this->client->page($module, $endpoint, $filters, $pageNumber);
+            $pagesProcessed++;
             $reportedTotal = (int) $page['total_items'];
             $reportedPages = (int) $page['total_pages'];
 
@@ -55,10 +57,10 @@ class TransfereGovSyncService
             'module' => $module,
             'endpoint' => $endpoint,
             'processed' => $processed,
-            'pages_processed' => $pageNumber,
+            'pages_processed' => $pagesProcessed,
             'reported_total_items' => $reportedTotal,
             'reported_total_pages' => $reportedPages,
-            'truncated' => $reportedPages !== null && $pageNumber < $reportedPages,
+            'truncated' => $reportedPages !== null && $pagesProcessed < $reportedPages,
         ];
     }
 }
