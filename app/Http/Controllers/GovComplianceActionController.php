@@ -23,7 +23,7 @@ class GovComplianceActionController extends Controller
         }
 
         $data = $request->validate([
-            'status' => ['required', 'in:pending,in_review,conformant'],
+            'status' => ['required', 'in:pending,submitted'],
             'note' => ['nullable', 'string', 'max:3000'],
             'evidence' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
         ]);
@@ -64,12 +64,8 @@ class GovComplianceActionController extends Controller
                 'updated_by_user_id' => $request->user()->getKey(),
             ];
 
-            if ($data['status'] === 'in_review') {
+            if ($data['status'] === 'submitted') {
                 $changes['submitted_at'] = now();
-            }
-
-            if ($data['status'] === 'conformant') {
-                $changes['resolved_at'] = now();
             }
 
             $complianceItem->forceFill($changes)->save();
@@ -84,7 +80,7 @@ class GovComplianceActionController extends Controller
         });
 
         return redirect()->route('gov.compliance', ['focus' => $item])
-            ->with('status', 'Compliance atualizado com sucesso.');
+            ->with('status', 'Compliance atualizado e, quando submetido, encaminhado para revisão.');
     }
 
     public function evidence(
