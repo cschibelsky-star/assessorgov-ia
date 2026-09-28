@@ -1,0 +1,39 @@
+<?php
+
+namespace Tests\Feature\Gov;
+
+use App\Models\Customer;
+use App\Models\CustomerOpportunity;
+use App\Models\Opportunity;
+use App\Models\User;
+use App\Services\Gov\GovIntelligenceService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class GovIntelligenceTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_fixed_customer_profile_returns_expected_current_catalog(): void
+    {
+        $customer = Customer::factory()->create();
+        $user = User::factory()->forCustomer($customer)->create();
+        $opportunity = Opportunity::factory()->create(['channel' => Opportunity::CHANNEL_LICITACAO]);
+
+        CustomerOpportunity::factory()->create([
+            'customer_id' => $customer->getKey(),
+            'opportunity_id' => $opportunity->getKey(),
+            'stage' => CustomerOpportunity::STAGE_PARTICIPATION,
+        ]);
+
+        $result = app(GovIntelligenceService::class)->forUser($user);
+        $ids = collect($result['items'])->pluck('id');
+
+        $this->assertContains('tcu-staffing-feasibility-2026-09', $ids);
+        $this->assertContains('tcu-zero-cost-2026-09', $ids);
+        $this->assertContains('tcu-economic-group-conflict-2026-09', $ids);
+        $this->assertContains('sicx-2026', $ids);
+        $this->assertContains('irp-pncp-2026', $ids);
+        $this->assertSame(5, $result['stats']['new_changes']);
+    }
+}
