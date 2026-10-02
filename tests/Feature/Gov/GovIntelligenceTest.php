@@ -8,6 +8,7 @@ use App\Models\Opportunity;
 use App\Models\User;
 use App\Services\Gov\GovIntelligenceService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 class GovIntelligenceTest extends TestCase
@@ -16,6 +17,7 @@ class GovIntelligenceTest extends TestCase
 
     public function test_fixed_customer_profile_returns_expected_current_catalog(): void
     {
+        $this->travelTo(Carbon::parse('2026-09-25 12:00:00'));
         $customer = Customer::factory()->create();
         $user = User::factory()->forCustomer($customer)->create();
         $opportunity = Opportunity::factory()->create(['channel' => Opportunity::CHANNEL_LICITACAO]);
