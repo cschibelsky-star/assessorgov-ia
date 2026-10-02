@@ -13,8 +13,7 @@ class SyncCulturalOpportunityToCanonical
         private readonly CulturalOpportunityCanonicalAdapter $adapter,
         private readonly OpportunityNormalizer $normalizer,
         private readonly OpportunityUpserter $upserter,
-    ) {
-    }
+    ) {}
 
     public function sync(CulturalOpportunity $culturalOpportunity): Opportunity
     {

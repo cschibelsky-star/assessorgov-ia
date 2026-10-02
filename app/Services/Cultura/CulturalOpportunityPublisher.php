@@ -10,8 +10,7 @@ class CulturalOpportunityPublisher
 {
     public function __construct(
         private readonly SyncCulturalOpportunityToCanonical $canonicalSync,
-    ) {
-    }
+    ) {}
 
     public function pendingReview(int $limit = 100): Collection
     {

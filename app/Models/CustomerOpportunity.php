@@ -11,13 +11,21 @@ class CustomerOpportunity extends Model
     use HasFactory;
 
     public const STAGE_DETECTED = 'detected';
+
     public const STAGE_MATCHED = 'matched';
+
     public const STAGE_ANALYSIS = 'analysis';
+
     public const STAGE_STRATEGY = 'strategy';
+
     public const STAGE_PARTICIPATION = 'participation';
+
     public const STAGE_CLASSIFIED_WAITING = 'classified_waiting';
+
     public const STAGE_EXECUTION = 'execution';
+
     public const STAGE_FINANCIAL = 'financial';
+
     public const STAGE_COMPLETED = 'completed';
 
     protected $fillable = [

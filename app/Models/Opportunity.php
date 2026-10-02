@@ -12,9 +12,13 @@ class Opportunity extends Model
     use HasFactory;
 
     public const CHANNEL_LICITACAO = 'licitacao';
+
     public const CHANNEL_IRP = 'irp';
+
     public const CHANNEL_SICX = 'sicx';
+
     public const CHANNEL_REMANESCENTE = 'remanescente';
+
     public const CHANNEL_FOMENTO = 'fomento';
 
     protected $fillable = [

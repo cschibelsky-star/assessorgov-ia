@@ -12,8 +12,7 @@ class PncpContractingIngestor
         private readonly PncpContractingAdapter $adapter,
         private readonly OpportunityNormalizer $normalizer,
         private readonly OpportunityUpserter $upserter,
-    ) {
-    }
+    ) {}
 
     public function ingest(
         DateTimeInterface $from,
