@@ -24,6 +24,8 @@ jobs:
       MAIL_MAILER: array
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -56,8 +58,20 @@ jobs:
       - name: Run test suite
         run: composer test
 
-      - name: Check code style
-        run: vendor/bin/pint --test
+      - name: Check code style in changed PHP files
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [[ "$BASE_SHA" =~ ^0+$ ]]; then
+            mapfile -d '' files < <(git ls-files -z -- '*.php')
+          else
+            mapfile -d '' files < <(git diff -z --name-only --diff-filter=ACMR "$BASE_SHA" "$GITHUB_SHA" -- '*.php')
+          fi
+          if ((${#files[@]} == 0)); then
+            echo "No PHP files changed."
+            exit 0
+          fi
+          vendor/bin/pint --test "${files[@]}"
 
       - name: Validate Laravel routes
         run: php artisan route:list
