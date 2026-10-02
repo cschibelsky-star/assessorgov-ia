@@ -6,10 +6,10 @@ use App\Http\Controllers\CulturalOpportunityController;
 use App\Http\Controllers\CulturalProfileController;
 use App\Http\Controllers\GovComplianceActionController;
 use App\Http\Controllers\GovComplianceController;
-use App\Http\Controllers\GovIntelligenceActionController;
-use App\Http\Controllers\GovIntelligenceController;
 use App\Http\Controllers\GovComplianceReviewController;
 use App\Http\Controllers\GovComplianceReviewQueueController;
+use App\Http\Controllers\GovIntelligenceActionController;
+use App\Http\Controllers\GovIntelligenceController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'home')->name('home');
