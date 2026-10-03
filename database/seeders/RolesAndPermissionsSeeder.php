@@ -27,6 +27,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'documents.review',
             'audit.view',
             'settings.manage',
+            'compliance.review',
         ];
 
         foreach ($permissions as $permission) {
