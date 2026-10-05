@@ -81,7 +81,15 @@ class PncpTaiacuAcceptanceTest extends TestCase
         $this->assertSame($official['processo'], $opportunity->metadata['numero_processo']);
         $this->assertSame(6, $opportunity->metadata['modalidade_id']);
         $this->assertSame($official['modalidadeNome'], $opportunity->metadata['modalidade_nome']);
+        $this->assertSame($official['modoDisputaNome'], $opportunity->metadata['modo_disputa_nome']);
+        $this->assertSame($official['situacaoCompraNome'], $opportunity->metadata['situacao_compra_nome']);
+        $this->assertSame($official['amparoLegal']['codigo'], $opportunity->metadata['amparo_legal_codigo']);
+        $this->assertSame($official['amparoLegal']['nome'], $opportunity->metadata['amparo_legal_nome']);
+        $this->assertSame($official['tipoInstrumentoConvocatorioNome'], $opportunity->metadata['instrumento_convocatorio_nome']);
+        $this->assertSame($official['usuarioNome'], $opportunity->metadata['fonte_plataforma']);
         $this->assertSame('44544690000115', $opportunity->metadata['orgao_cnpj']);
+        $this->assertSame($official['dataInclusao'], $opportunity->metadata['data_inclusao_pncp']);
+        $this->assertSame($official['dataAtualizacaoGlobal'], $opportunity->metadata['data_atualizacao_global_pncp']);
 
         $second = $ingestor->ingest($date, $date, 6, $filters, maxPages: 1);
         $this->assertSame(1, $second['upserted']);
