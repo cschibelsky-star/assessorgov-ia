@@ -11,7 +11,7 @@ class PncpContractingAdapter implements OpportunitySourceAdapter
 {
     public function toCanonical(mixed $source): array
     {
-        if (! is_array($source)) {
+        if (!is_array($source)) {
             throw new InvalidArgumentException('PNCP contracting source must be an array.');
         }
 
