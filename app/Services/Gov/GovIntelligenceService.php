@@ -43,7 +43,7 @@ class GovIntelligenceService
             ->values();
 
         $weeklyItems = $items->filter(
-            fn (array $item): bool => !empty($item['published_at'])
+            fn (array $item): bool => ! empty($item['published_at'])
                 && $item['published_at'] >= now()->subDays(7)->toDateString(),
         );
 
@@ -74,7 +74,7 @@ class GovIntelligenceService
     {
         $item = $this->catalog()->firstWhere('id', $itemId);
 
-        if (!$item) {
+        if (! $item) {
             throw new InvalidArgumentException('Gov Intelligence item not found.');
         }
 
@@ -85,7 +85,7 @@ class GovIntelligenceService
     {
         $customer = $user->customer;
 
-        if (!$customer) {
+        if (! $customer) {
             return [
                 'status' => 'customer_required',
                 'applied' => 0,
@@ -163,7 +163,7 @@ class GovIntelligenceService
     {
         $customer = $user->customer;
 
-        if (!$customer) {
+        if (! $customer) {
             return [
                 'customer' => null,
                 'actions' => collect(),
@@ -248,7 +248,7 @@ class GovIntelligenceService
 
         $item['relevant'] = $relevant;
         $item['personalized_reason'] = match (true) {
-            !$customer => 'Complete o cadastro empresarial para ampliar a personalização deste alerta.',
+            ! $customer => 'Complete o cadastro empresarial para ampliar a personalização deste alerta.',
             $matchedChannel => 'Sua empresa possui oportunidade vinculada a um dos canais afetados por esta mudança.',
             ($item['participation_sensitive'] ?? false) && $inParticipation => 'Sua empresa possui oportunidade em fase que exige atenção a esta regra.',
             $relevant => 'Regra aplicável de forma geral a fornecedores que participam de contratações públicas.',
