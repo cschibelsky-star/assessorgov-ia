@@ -66,7 +66,7 @@ class PncpContractingAdapter implements OpportunitySourceAdapter
                 'numero_controle_pncp' => $source['numeroControlePNCP'] ?? null,
                 'numero_compra' => $number ?: null,
                 'ano_compra' => $year ?: null,
-                'numero_processo' => $source['numeroProcesso'] ?? null,
+                'numero_processo' => $source['processo'] ?? $source['numeroProcesso'] ?? null,
                 'modalidade_id' => $source['modalidadeId'] ?? null,
                 'modalidade_nome' => $source['modalidadeNome'] ?? null,
                 'modo_disputa_id' => $source['modoDisputaId'] ?? null,

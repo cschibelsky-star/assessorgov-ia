@@ -1,0 +1,62 @@
+{
+  "data": [
+    {
+      "valorTotalHomologado": null,
+      "orgaoEntidade": {
+        "cnpj": "44544690000115",
+        "razaoSocial": "MUNICIPIO DE TAIACU",
+        "poderId": "N",
+        "esferaId": "M"
+      },
+      "dataInclusao": "2026-10-02T14:19:00",
+      "dataAtualizacao": "2026-10-02T14:19:01",
+      "anoCompra": 2026,
+      "srp": false,
+      "sequencialCompra": 136,
+      "emendaParlamentar": null,
+      "numeroCompra": "21",
+      "processo": "713",
+      "objetoCompra": "[Portal de Compras Públicas] - AQUISIÇÃO DE EQUIPAMENTOS DE INFORMÁTICA, CLIMATIZAÇÃO E PROJEÇÃO MULTIMÍDIA, BEM COMO DE CADEIRAS ESCOLARES, DESTINADOS À ESTRUTURAÇÃO DA SALA DE INFORMÁTICA DA EMEB PROFESSOR WILSON ANTÔNIO GONÇALVES",
+      "informacaoComplementar": "",
+      "dataAberturaProposta": "2026-10-05T08:00:00",
+      "dataEncerramentoProposta": "2026-10-16T08:59:00",
+      "dataPublicacaoPncp": "2026-10-02T14:19:00",
+      "dataAtualizacaoGlobal": "2026-10-02T14:19:01",
+      "unidadeOrgao": {
+        "ufNome": "São Paulo",
+        "ufSigla": "SP",
+        "municipioNome": "Taiaçu",
+        "codigoUnidade": "4362",
+        "nomeUnidade": "Prefeitura Municipal de Taiaçu",
+        "codigoIbge": "3553104"
+      },
+      "orgaoSubRogado": null,
+      "unidadeSubRogada": null,
+      "amparoLegal": {
+        "nome": "Lei 14.133/2021, Art. 28, I",
+        "descricao": "pregão: modalidade de licitação obrigatória para aquisição de bens e serviços comuns",
+        "codigo": 1
+      },
+      "linkSistemaOrigem": "https://www.portaldecompraspublicas.com.br/processos/SP/Prefeitura-Municipal-de-Taiacu-2425/PE-21-2026-2026-515959",
+      "linkProcessoEletronico": null,
+      "justificativaPresencial": "",
+      "numeroControlePNCP": "44544690000115-1-000136/2026",
+      "valorTotalEstimado": 84882.67,
+      "modalidadeId": 6,
+      "modalidadeNome": "Pregão - Eletrônico",
+      "modoDisputaId": 3,
+      "modoDisputaNome": "Aberto-Fechado",
+      "tipoInstrumentoConvocatorioCodigo": 1,
+      "tipoInstrumentoConvocatorioNome": "Edital",
+      "fontesOrcamentarias": [],
+      "situacaoCompraId": 1,
+      "situacaoCompraNome": "Divulgada no PNCP",
+      "usuarioNome": "ECustomize Consultoria em Software S.A"
+    }
+  ],
+  "totalRegistros": 1,
+  "totalPaginas": 1,
+  "numeroPagina": 1,
+  "paginasRestantes": 0,
+  "empty": false
+}
