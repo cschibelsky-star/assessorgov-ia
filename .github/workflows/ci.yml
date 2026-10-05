@@ -71,7 +71,10 @@ jobs:
             echo "No PHP files changed."
             exit 0
           fi
-          vendor/bin/pint --test "${files[@]}"
+          vendor/bin/pint "${files[@]}"
+          echo "----- PINT DIFF -----"
+          git diff -- "${files[@]}"
+          exit 1
 
       - name: Validate Laravel routes
         run: php artisan route:list
