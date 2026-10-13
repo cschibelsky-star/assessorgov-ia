@@ -2,6 +2,7 @@
 
 namespace App\Services\TransfereGov;
 
+use App\Services\Radar\OperationalSearchGate;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 use InvalidArgumentException;
@@ -19,6 +20,8 @@ class TransfereGovClient
 
     public function get(string $module, string $endpoint = '', array $query = []): array
     {
+        app(OperationalSearchGate::class)->assertAllowed();
+
         $modules = (array) config('transferegov.modules', []);
 
         if (! isset($modules[$module])) {

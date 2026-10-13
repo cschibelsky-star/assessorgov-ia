@@ -1,0 +1,284 @@
+{
+  "checked_at": "2026-10-13",
+  "official_page": "https://www.taiacu.sp.gov.br/licitacao/5-21-2026",
+  "edital": "https://www.taiacu.sp.gov.br/files/biddings/515/6abff7b000302.pdf",
+  "term": "https://www.taiacu.sp.gov.br/files/biddings/515/6abff8393bd22.pdf",
+  "pncp_live_verified": false,
+  "process": "713/2026",
+  "edital_number": "27/2026",
+  "proposal_deadline": "2026-10-16T08:59:00-03:00",
+  "estimated_value": 84882.67,
+  "notes": "Reviewed synthetic screening rules, not legal habilitation. Legal exceptions and applicability require human review. Technical proof for items 3/4 belongs to proposal acceptance, not corporate habilitation.",
+  "items": [
+    {
+      "id": "taiacu:1",
+      "activity": "climate_supply",
+      "quantity": 1,
+      "unit_price": 3515.26,
+      "requirements": [
+        {
+          "key": "portal_registration",
+          "expires": false
+        },
+        {
+          "key": "participation_declarations",
+          "expires": false
+        },
+        {
+          "key": "sanctions_check"
+        },
+        {
+          "key": "legal_activity",
+          "expires": false
+        },
+        {
+          "key": "cnpj",
+          "expires": false
+        },
+        {
+          "key": "tax_registration",
+          "expires": false
+        },
+        {
+          "key": "fgts",
+          "me_epp_regularization": true
+        },
+        {
+          "key": "federal_clearance",
+          "me_epp_regularization": true
+        },
+        {
+          "key": "state_clearance",
+          "me_epp_regularization": true
+        },
+        {
+          "key": "municipal_clearance",
+          "me_epp_regularization": true
+        },
+        {
+          "key": "cndt",
+          "me_epp_regularization": true
+        },
+        {
+          "key": "bankruptcy_clearance"
+        },
+        {
+          "key": "delivery_30_days",
+          "expires": false
+        },
+        {
+          "key": "warranty_12_months",
+          "expires": false
+        },
+        {
+          "key": "national_technical_assistance",
+          "expires": false
+        }
+      ],
+      "requirements_reviewed": true
+    },
+    {
+      "id": "taiacu:2",
+      "activity": "chair_supply",
+      "quantity": 29,
+      "unit_price": 124.67,
+      "requirements": [
+        {
+          "key": "portal_registration",
+          "expires": false
+        },
+        {
+          "key": "participation_declarations",
+          "expires": false
+        },
+        {
+          "key": "sanctions_check"
+        },
+        {
+          "key": "legal_activity",
+          "expires": false
+        },
+        {
+          "key": "cnpj",
+          "expires": false
+        },
+        {
+          "key": "tax_registration",
+          "expires": false
+        },
+        {
+          "key": "fgts",
+          "me_epp_regularization": true
+        },
+        {
+          "key": "federal_clearance",
+          "me_epp_regularization": true
+        },
+        {
+          "key": "state_clearance",
+          "me_epp_regularization": true
+        },
+        {
+          "key": "municipal_clearance",
+          "me_epp_regularization": true
+        },
+        {
+          "key": "cndt",
+          "me_epp_regularization": true
+        },
+        {
+          "key": "bankruptcy_clearance"
+        },
+        {
+          "key": "delivery_30_days",
+          "expires": false
+        },
+        {
+          "key": "warranty_12_months",
+          "expires": false
+        }
+      ],
+      "requirements_reviewed": true
+    },
+    {
+      "id": "taiacu:3",
+      "activity": "computer_supply",
+      "quantity": 15,
+      "unit_price": 4872.89,
+      "requirements": [
+        {
+          "key": "portal_registration",
+          "expires": false
+        },
+        {
+          "key": "participation_declarations",
+          "expires": false
+        },
+        {
+          "key": "sanctions_check"
+        },
+        {
+          "key": "legal_activity",
+          "expires": false
+        },
+        {
+          "key": "cnpj",
+          "expires": false
+        },
+        {
+          "key": "tax_registration",
+          "expires": false
+        },
+        {
+          "key": "fgts",
+          "me_epp_regularization": true
+        },
+        {
+          "key": "federal_clearance",
+          "me_epp_regularization": true
+        },
+        {
+          "key": "state_clearance",
+          "me_epp_regularization": true
+        },
+        {
+          "key": "municipal_clearance",
+          "me_epp_regularization": true
+        },
+        {
+          "key": "cndt",
+          "me_epp_regularization": true
+        },
+        {
+          "key": "bankruptcy_clearance"
+        },
+        {
+          "key": "delivery_30_days",
+          "expires": false
+        },
+        {
+          "key": "warranty_12_months",
+          "expires": false
+        },
+        {
+          "key": "technical_catalog",
+          "scope": "item",
+          "expires": false
+        }
+      ],
+      "requirements_reviewed": true
+    },
+    {
+      "id": "taiacu:4",
+      "activity": "projector_supply",
+      "quantity": 1,
+      "unit_price": 4658.63,
+      "requirements": [
+        {
+          "key": "portal_registration",
+          "expires": false
+        },
+        {
+          "key": "participation_declarations",
+          "expires": false
+        },
+        {
+          "key": "sanctions_check"
+        },
+        {
+          "key": "legal_activity",
+          "expires": false
+        },
+        {
+          "key": "cnpj",
+          "expires": false
+        },
+        {
+          "key": "tax_registration",
+          "expires": false
+        },
+        {
+          "key": "fgts",
+          "me_epp_regularization": true
+        },
+        {
+          "key": "federal_clearance",
+          "me_epp_regularization": true
+        },
+        {
+          "key": "state_clearance",
+          "me_epp_regularization": true
+        },
+        {
+          "key": "municipal_clearance",
+          "me_epp_regularization": true
+        },
+        {
+          "key": "cndt",
+          "me_epp_regularization": true
+        },
+        {
+          "key": "bankruptcy_clearance"
+        },
+        {
+          "key": "delivery_30_days",
+          "expires": false
+        },
+        {
+          "key": "warranty_12_months",
+          "expires": false
+        },
+        {
+          "key": "technical_catalog",
+          "scope": "item",
+          "expires": false
+        },
+        {
+          "key": "me_epp",
+          "expires": false
+        }
+      ],
+      "requirements_reviewed": true
+    }
+  ]
+}

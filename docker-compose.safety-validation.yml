@@ -1,0 +1,23 @@
+name: assessorgov-safety-hml-20261013
+
+services:
+  safety_validation:
+    build:
+      context: .
+      dockerfile: Dockerfile.hml-validation
+    image: assessorgov-safety-validation:20261013
+    restart: "no"
+    network_mode: none
+    environment:
+      APP_ENV: testing
+      DB_CONNECTION: sqlite
+      DB_DATABASE: ":memory:"
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+      PNCP_LIVE_ACCEPTANCE: "0"
+    labels:
+      com.vitrine.environment: isolated-validation
+      com.vitrine.synthetic-only: "true"
+      com.vitrine.operational-gate: blocked

@@ -25,6 +25,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'subscriptions.manage',
             'documents.generate',
             'documents.review',
+            'radar.screen',
             'audit.view',
             'settings.manage',
             'compliance.review',
@@ -43,6 +44,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'subscriptions.view',
             'documents.generate',
             'documents.review',
+            'radar.screen',
             'audit.view',
         ]);
 
@@ -50,6 +52,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'dashboard.view',
             'documents.generate',
             'documents.review',
+            'radar.screen',
         ]);
 
         Role::findOrCreate('consulta', 'web')->syncPermissions([

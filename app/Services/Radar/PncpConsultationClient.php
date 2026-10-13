@@ -16,6 +16,8 @@ class PncpConsultationClient
         int $page = 1,
         array $filters = [],
     ): array {
+        app(OperationalSearchGate::class)->assertAllowed();
+
         if ($modalityCode < 1) {
             throw new RuntimeException('PNCP modality code must be a positive integer.');
         }
