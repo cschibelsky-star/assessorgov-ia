@@ -22,6 +22,7 @@ ENV APP_ENV=testing \
 
 COPY . .
 RUN mkdir -p bootstrap/cache storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs \
+    && touch .env \
     && composer install --no-interaction --prefer-dist --no-progress
 
 CMD ["sh", "-c", "composer test && vendor/bin/pint --test app/Services/Radar/CustomerOpportunityScreeningAction.php app/Services/Radar/CustomerOpportunityScreeningService.php app/Services/Radar/OperationalSearchGate.php app/Services/Radar/ReviewedCustomerOpportunityScreeningAction.php app/Services/Radar/ReviewedEvidenceProfileProvider.php tests/Feature/Radar/AssessorGovSafetyGateTest.php tests/Feature/Radar/OperationalSearchGateTest.php && php artisan route:list"]
