@@ -8,6 +8,7 @@ use App\Services\Radar\OperationalSearchGate;
 use App\Services\Radar\PncpConsultationClient;
 use App\Services\TransfereGov\TransfereGovClient;
 use DateTimeImmutable;
+use Illuminate\Http\Client\StrayRequestException;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 use Tests\TestCase;
@@ -54,7 +55,7 @@ class OperationalSearchGateTest extends TestCase
     public function test_testing_gate_allows_fakes_and_rejects_unfaked_http(): void
     {
         app(OperationalSearchGate::class)->assertAllowed();
-        $this->expectException(\Illuminate\Http\Client\StrayRequestException::class);
+        $this->expectException(StrayRequestException::class);
         Http::get('https://synthetic.example.test/unfaked');
     }
 }
