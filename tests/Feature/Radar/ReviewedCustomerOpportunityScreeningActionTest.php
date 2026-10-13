@@ -10,6 +10,7 @@ use App\Services\Radar\ReviewedCustomerOpportunityScreeningAction;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
 
 class ReviewedCustomerOpportunityScreeningActionTest extends TestCase
@@ -20,6 +21,7 @@ class ReviewedCustomerOpportunityScreeningActionTest extends TestCase
     {
         $customer = Customer::factory()->create();
         $actor = User::factory()->create(['customer_id' => $customer->getKey()]);
+        $actor->givePermissionTo(Permission::findOrCreate('radar.screen', 'web'));
         $record = CustomerOpportunity::query()->create([
             'customer_id' => $customer->getKey(),
             'opportunity_id' => Opportunity::factory()->create()->getKey(),
@@ -46,6 +48,7 @@ class ReviewedCustomerOpportunityScreeningActionTest extends TestCase
         $owner = Customer::factory()->create();
         $other = Customer::factory()->create();
         $actor = User::factory()->create(['customer_id' => $other->getKey()]);
+        $actor->givePermissionTo(Permission::findOrCreate('radar.screen', 'web'));
         $record = CustomerOpportunity::query()->create([
             'customer_id' => $owner->getKey(),
             'opportunity_id' => Opportunity::factory()->create()->getKey(),

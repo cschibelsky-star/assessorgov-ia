@@ -3,6 +3,7 @@
 namespace App\Services\Cultura;
 
 use App\Models\CulturalSource;
+use App\Services\Radar\OperationalSearchGate;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
@@ -10,6 +11,8 @@ class CulturalSourceIngestor
 {
     public function ingest(CulturalSource $source): array
     {
+        app(OperationalSearchGate::class)->assertAllowed();
+
         $source->forceFill([
             'last_checked_at' => now(),
             'last_status' => 'running',

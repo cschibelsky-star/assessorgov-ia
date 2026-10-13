@@ -42,6 +42,7 @@ class ReviewedEvidenceProfileProviderTest extends TestCase
                 'mime_type' => 'application/pdf',
                 'sha256' => (string) $owner->getKey(),
                 'size_bytes' => 12,
+                'uploaded_at' => now()->subMinute(),
             ]);
         }
 

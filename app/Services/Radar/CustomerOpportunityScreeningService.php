@@ -33,6 +33,33 @@ final class CustomerOpportunityScreeningService
         }
 
         $result = $this->classifier->classify($item, $profile, $at);
+        // A client/item payload cannot establish the linked opportunity's validity.
+        $opportunity = $record->exists ? $record->opportunity : null;
+        $opportunityGaps = [];
+        if (! $opportunity || $opportunity->status !== 'active') {
+            $opportunityGaps[] = 'opportunity_status';
+        }
+        if (! $opportunity?->closes_at || $opportunity->closes_at <= $at) {
+            $opportunityGaps[] = 'opportunity_deadline';
+        }
+        if (! $opportunity?->source_checked_at || $opportunity->source_checked_at > $at
+            || $opportunity->source_type !== 'official'
+            || ! filter_var($opportunity->source_url, FILTER_VALIDATE_URL)) {
+            $opportunityGaps[] = 'opportunity_source_confirmation';
+        }
+        if (($item['opportunity_id'] ?? null) !== (string) $record->opportunity_id) {
+            $opportunityGaps[] = 'item_opportunity_scope';
+        }
+        if ($opportunityGaps !== []) {
+            $result['gaps'] = array_values(array_unique(array_merge($result['gaps'], $opportunityGaps)));
+            $result['match_reasons'][] = 'Oportunidade ou vínculo do item não confirmado; análise operacional bloqueada.';
+            if ($result['eligibility'] !== 'blocked') {
+                $result['eligibility'] = 'pending_evidence';
+            }
+            if ($result['classification'] === 'compatible_for_analysis') {
+                $result['classification'] = 'pending_evidence';
+            }
+        }
         $metadata = is_array($record->metadata) ? $record->metadata : [];
 
         $metadata['item_screening'] = [

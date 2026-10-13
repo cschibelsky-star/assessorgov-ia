@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Services\Radar\CustomerOpportunityScreeningAction;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
 
 class CustomerOpportunityScreeningActionTest extends TestCase
@@ -19,6 +20,7 @@ class CustomerOpportunityScreeningActionTest extends TestCase
     {
         $customer = Customer::factory()->create();
         $actor = User::factory()->create(['customer_id' => $customer->getKey()]);
+        $actor->givePermissionTo(Permission::findOrCreate('radar.screen', 'web'));
         $record = CustomerOpportunity::query()->create([
             'customer_id' => $customer->getKey(),
             'opportunity_id' => Opportunity::factory()->create()->getKey(),
@@ -43,6 +45,7 @@ class CustomerOpportunityScreeningActionTest extends TestCase
         $customer = Customer::factory()->create();
         $other = Customer::factory()->create();
         $actor = User::factory()->create(['customer_id' => $customer->getKey()]);
+        $actor->givePermissionTo(Permission::findOrCreate('radar.screen', 'web'));
         $this->expectException(AuthorizationException::class);
 
         app(CustomerOpportunityScreeningAction::class)->execute(

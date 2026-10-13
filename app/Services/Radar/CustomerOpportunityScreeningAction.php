@@ -22,7 +22,15 @@ final class CustomerOpportunityScreeningAction
         array $profile,
         DateTimeImmutable $at,
     ): CustomerOpportunity {
-        $customerId = $actor->customer?->getKey();
+        // Reload the actor: unsaved, disabled or stale tenant claims are denied.
+        $persistedActor = $actor->exists ? User::query()->find($actor->getKey()) : null;
+        if (! $persistedActor || $persistedActor->status !== 'active'
+            || $persistedActor->customer_id !== $actor->customer_id
+            || ! $persistedActor->can('radar.screen')) {
+            throw new AuthorizationException('An active actor with radar.screen is required.');
+        }
+
+        $customerId = $persistedActor->customer?->getKey();
 
         if (! is_string($customerId) || $customerId === ''
             || ($profile['customer_id'] ?? null) !== $customerId) {

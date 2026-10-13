@@ -33,7 +33,9 @@ final class ReviewedEvidenceProfileProvider
 
         foreach ($items as $item) {
             $evidence = $item->latestEvidence;
-            if (! $evidence || ! is_string($evidence->sha256)
+            if (! $evidence || ! $evidence->uploaded_at
+                || $evidence->uploaded_at->greaterThan($item->reviewed_at)
+                || ! is_string($evidence->sha256)
                 || trim($evidence->sha256) === '') {
                 continue;
             }

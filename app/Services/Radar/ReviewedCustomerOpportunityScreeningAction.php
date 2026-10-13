@@ -24,7 +24,15 @@ final class ReviewedCustomerOpportunityScreeningAction
         array $reviewedItem,
         DateTimeImmutable $at,
     ): CustomerOpportunity {
-        $customerId = $actor->customer_id;
+        // Reload the actor: unsaved, disabled or stale tenant claims are denied.
+        $persistedActor = $actor->exists ? User::query()->find($actor->getKey()) : null;
+        if (! $persistedActor || $persistedActor->status !== 'active'
+            || $persistedActor->customer_id !== $actor->customer_id
+            || ! $persistedActor->can('radar.screen')) {
+            throw new AuthorizationException('An active actor with radar.screen is required.');
+        }
+
+        $customerId = $persistedActor->customer_id;
 
         if (! is_string($customerId) || trim($customerId) === '') {
             throw new AuthorizationException('Authenticated customer required.');
