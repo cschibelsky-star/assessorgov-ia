@@ -1,0 +1,27 @@
+FROM php:8.3-cli
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git unzip libonig-dev libsqlite3-dev \
+    && docker-php-ext-install mbstring pdo_sqlite \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
+WORKDIR /app
+
+ENV APP_ENV=testing \
+    APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA= \
+    APP_DEBUG=false \
+    APP_URL=http://localhost \
+    DB_CONNECTION=sqlite \
+    DB_DATABASE=:memory: \
+    CACHE_STORE=array \
+    SESSION_DRIVER=array \
+    QUEUE_CONNECTION=sync \
+    MAIL_MAILER=array \
+    PNCP_LIVE_ACCEPTANCE=0
+
+COPY . .
+RUN mkdir -p bootstrap/cache storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs \
+    && composer install --no-interaction --prefer-dist --no-progress
+
+CMD ["sh", "-c", "composer test && vendor/bin/pint --test app/Services/Radar/CustomerOpportunityScreeningAction.php app/Services/Radar/CustomerOpportunityScreeningService.php app/Services/Radar/OperationalSearchGate.php app/Services/Radar/ReviewedCustomerOpportunityScreeningAction.php app/Services/Radar/ReviewedEvidenceProfileProvider.php tests/Feature/Radar/AssessorGovSafetyGateTest.php tests/Feature/Radar/OperationalSearchGateTest.php && php artisan route:list"]
