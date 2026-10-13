@@ -38,6 +38,8 @@ class ReviewedEvidenceProfileProviderTest extends TestCase
                 'gov_compliance_item_id' => $item->getKey(),
                 'disk' => 'local',
                 'path' => 'tests/fixture.pdf',
+                'original_name' => 'fixture.pdf',
+                'mime_type' => 'application/pdf',
                 'sha256' => (string) $owner->getKey(),
                 'size_bytes' => 12,
             ]);
