@@ -5,6 +5,7 @@ namespace Tests\Feature\Radar;
 use App\Models\Customer;
 use App\Models\GovComplianceEvidence;
 use App\Models\GovComplianceItem;
+use App\Models\User;
 use App\Services\Radar\ReviewedEvidenceProfileProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -18,6 +19,8 @@ class ReviewedEvidenceProfileProviderTest extends TestCase
         $customer = Customer::factory()->create();
         $other = Customer::factory()->create();
 
+        $reviewer = User::factory()->create();
+
         foreach ([$customer, $other] as $owner) {
             $item = GovComplianceItem::query()->create([
                 'customer_id' => $owner->getKey(),
@@ -28,7 +31,7 @@ class ReviewedEvidenceProfileProviderTest extends TestCase
                 'impact_class' => 'alter_checklist',
                 'target' => 'customer',
                 'status' => 'conformant',
-                'reviewed_by_user_id' => 1,
+                'reviewed_by_user_id' => $reviewer->getKey(),
                 'reviewed_at' => now(),
             ]);
             GovComplianceEvidence::query()->create([
