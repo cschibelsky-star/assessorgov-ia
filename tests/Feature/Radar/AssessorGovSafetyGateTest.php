@@ -102,6 +102,41 @@ class AssessorGovSafetyGateTest extends TestCase
         Notification::assertNothingSent();
     }
 
+    public function test_legacy_action_ignores_forged_same_tenant_evidence(): void
+    {
+        $customer = Customer::factory()->create();
+        $actor = User::factory()->create(['customer_id' => $customer->getKey()]);
+        $actor->givePermissionTo(Permission::findOrCreate('radar.screen', 'web'));
+        $opportunity = Opportunity::factory()->create(['closes_at' => now()->addDay()]);
+        $record = CustomerOpportunity::query()->create([
+            'customer_id' => $customer->getKey(),
+            'opportunity_id' => $opportunity->getKey(),
+            'stage' => CustomerOpportunity::STAGE_DETECTED,
+        ]);
+        $result = app(CustomerOpportunityScreeningAction::class)->execute(
+            $actor, (string) $record->getKey(),
+            [
+                'id' => 'synthetic:item',
+                'opportunity_id' => (string) $opportunity->getKey(),
+                'activity' => 'software',
+                'requirements_reviewed' => true,
+                'requirements' => [['key' => 'cnpj', 'expires' => false]],
+            ],
+            [
+                'customer_id' => (string) $customer->getKey(),
+                'activities' => ['software'],
+                'evidence' => ['cnpj' => [
+                    'customer_id' => (string) $customer->getKey(),
+                    'status' => 'verified',
+                    'reference' => 'forged:browser-claim',
+                ]],
+            ],
+            new DateTimeImmutable,
+        );
+        $this->assertContains('cnpj', $result->gaps);
+        $this->assertSame('pending_evidence', $result->metadata['item_screening']['classification']);
+    }
+
     public function test_screening_denies_inactive_unpersisted_stale_and_unprivileged_actors(): void
     {
         $customer = Customer::factory()->create();

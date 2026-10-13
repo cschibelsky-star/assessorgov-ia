@@ -70,3 +70,9 @@ Esse resultado não certifica runtime, cadastro jurídico nem habilitação.
 **Decisão: gate operacional NÃO APROVADO.** HML isolada, cadastro real e aceite continuam obrigatórios.
 Sem buscas reais, envio externo, migrations externas, deploy, merge ou cutover.
 A suíte de CI do novo commit deve ser verde antes de qualquer avaliação para HML.
+
+### Branches e limitações de reprodutibilidade
+- PRs #1 e #2 seguem draft, mesmo head dd06bc823651453e7549fd37a675da28de1ddff0; runs 37363891811/37363762107 com falha. Não foram integrados.
+- PR #3 segue draft, head 3512fd5604fe2db8eb79cd8f34bc01554f57f47f, CI 38403010004 success. Comparação #3 → base inspecionada #5: diverged, ahead 17/behind 3, merge base dd06bc8; não reconciliar automaticamente.
+- composer.lock ausente no CI: dependências resolvidas a cada execução. Exigir lock revisado antes de release reprodutível.
+- A ação legada também passa a carregar evidências server-side, conservando a assinatura e rejeição de customer_id cruzado.

@@ -54,7 +54,7 @@ class OperationalSearchGateTest extends TestCase
     public function test_testing_gate_allows_fakes_and_rejects_unfaked_http(): void
     {
         app(OperationalSearchGate::class)->assertAllowed();
-        $this->expectException(\Illuminate\Http\Client\Exceptions\StrayRequestException::class);
+        $this->expectException(\Illuminate\Http\Client\StrayRequestException::class);
         Http::get('https://synthetic.example.test/unfaked');
     }
 }

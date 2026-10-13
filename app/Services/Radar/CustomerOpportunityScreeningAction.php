@@ -37,6 +37,9 @@ final class CustomerOpportunityScreeningAction
             throw new AuthorizationException('A matching authenticated customer is required.');
         }
 
+        // Preserve the legacy signature, but never trust caller-supplied evidence.
+        $profile = app(ReviewedEvidenceProfileProvider::class)->forCustomer($customerId);
+
         return $this->persister->persist(
             $customerId,
             $customerOpportunityId,
