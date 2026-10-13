@@ -75,3 +75,15 @@ jobs:
 
       - name: Validate Laravel routes
         run: php artisan route:list
+
+  hml-safety-container:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build isolated HML validation image
+        run: docker build --file Dockerfile.hml-validation --tag assessorgov-safety:ci .
+
+      - name: Validate synthetic flow with no container network
+        run: docker run --rm --network none --cap-drop ALL --security-opt no-new-privileges assessorgov-safety:ci
